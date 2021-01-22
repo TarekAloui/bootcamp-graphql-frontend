@@ -20,25 +20,22 @@ const Home = () => {
     email,
   }
 
-  console.log(newAuthor)
-
-  const [addAuthor, { error: errorAdd, loading: loadingAdd }] = useMutation(ADD_AUTHOR, {
+  const [createAuthor, { error: errorAdd, loading: loadingAdd }] = useMutation(ADD_AUTHOR, {
     variables: {
       author: newAuthor,
     },
     // refetchQueries: () => [{ query: GET_ALL_AUTHORS }], // first solution
-    update: (client, { data: { allAuthors } }) => {
+    update: (client, { data: { addAuthor } }) => {
       try {
         const newData = client.readQuery({ query: GET_ALL_AUTHORS })
         newData.allAuthors = [...data.allAuthors, addAuthor]
         client.writeQuery({ query: GET_ALL_AUTHORS, data: newData })
       } catch (error) {
         // log something if in dev environment
+        console.log(error.message)
       }
     },
   })
-
-  if (!loading && called) console.log(`DATA ${data}`)
   return (
     <div style={{ display: 'flex', flexDirection: 'column' }}>
       <input type="text" placeholder="First Name" onChange={e => setFirstName(e.target.value)} value={firstName} />
@@ -46,7 +43,7 @@ const Home = () => {
       <input type="text" placeholder="age" onChange={e => setAge(e.target.value)} value={age} />
       <input type="text" placeholder="email" onChange={e => setEmail(e.target.value)} value={email} />
 
-      <button type="submit" onClick={addAuthor}>AddAuthor</button>
+      <button type="submit" onClick={createAuthor}>AddAuthor</button>
 
       <button type="submit" onClick={getAllAuthors}>LOAD</button>
       {error || errorAdd
